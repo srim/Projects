@@ -1,0 +1,181 @@
+#include "irq_test.h"
+/* This structure defines the function pointers to our functions for opening, closing, reading and writing the device file. There are lots of other pointers in this structure which we are not using, see the whole definition in linux/fs.h */ 
+
+static struct file_operations fops = { 
+	.read = device_read, 
+	.write = device_write, 
+	.open = device_open, 
+	.release = device_release 
+};
+
+
+/* * This function is called when the module is loaded and registers a * device for the driver to use. */
+
+int my_init(void) 
+{
+	// init_waitqueue_head(&queue); /* initialize the wait queue */ 
+	
+	printk("Mapping virtual address...\n"); 
+	virt_addr = ioremap(PHY_ADDR,MEMSIZE); //maps the physical address to virtual address
+
+	printk("physical address is: 0x%x\nvirtual address is: 0x%x\n", PHY_ADDR, virt_addr);
+
+	/* Initialize the semaphor we will use to protect against multiple users opening the device */ 
+	sema_init(&sem, 1);
+
+	Major = register_chrdev(0, DEVICE_NAME, &fops); 
+
+	if (Major < 0) 
+	{ 
+		printk(KERN_ALERT "Registering char device failed with %d\n", Major); 
+		return Major; 
+	}
+ 
+ 
+	printk(KERN_INFO "Registered a device with dynamic Major number of %d\n", Major); 
+	printk(KERN_INFO "Create a device file for this device with this command:\n'mknod /dev/%s c %d 0'.\n", DEVICE_NAME, Major);
+	return 0; /* success */ 
+}
+
+
+/* * This function is called when the module is unloaded, it releases * the device file. */ 
+
+void my_cleanup(void) 
+{ /* * Unregister the device*/ 
+	unregister_chrdev(Major, DEVICE_NAME); 
+	iounmap(virt_addr); //unmaps the virtual memory
+}
+
+
+
+/* 
+	* Called when a process tries to open the device file, like "cat * /dev/irq_test". Link to this function placed in 		file operations * structure for our device file. 
+*/ 
+
+static int device_open(struct inode *inode, struct file *file) 
+{ 
+	int irq_ret;
+	if (down_interruptible (&sem)) 
+	return -ERESTARTSYS;
+
+
+	/* We are only allowing one process to hold the device file open at a time. */ 
+	if (Device_Open)
+	{ 
+		up(&sem); 
+		return -EBUSY; 
+	} 
+
+	Device_Open++;
+
+
+	/* OK we are now past the critical section, we can release the semaphore and all will be well */ 
+	up(&sem);
+	/* request a fast IRQ and set handler */ 
+	irq_ret = request_irq(IRQ_NUM, irq_handler, 0 /*flags*/ , DEVICE_NAME, NULL); 
+
+	if (irq_ret < 0) 
+	{
+ 		/* handle errors */ 
+		printk(KERN_ALERT "Registering IRQ failed with %d\n", irq_ret); 
+		return irq_ret; 
+	}
+
+
+	try_module_get(THIS_MODULE); /* increment the module use count (make sure this is accurate or you won't be able to 						remove the module later. */
+
+	start = (int*)kmalloc(100*sizeof(int),GFP_KERNEL); //dynamic allocation of memory
+  	
+
+	message = start; //set message start to beginning
+
+	curr = (char*)start; //set current to beginning 
+	end = start; //set end of allocated memory to beginning
+	// msg_Ptr = NULL;
+	return 0; 
+}
+
+
+/* * Called when a process closes the device file. */ 
+
+static int device_release(struct inode *inode, struct file *file) 
+{ 
+	Device_Open--; /* We're now ready for our next caller */ 
+	free_irq(IRQ_NUM, NULL); 
+	/* Decrement the usage count, or else once you opened the file, * you'll never get get rid of the module. */ 
+	module_put(THIS_MODULE);
+	return 0; 
+}
+
+/* * Called when a process, which already opened the dev file, attempts to * read from it. */ 
+static ssize_t device_read(struct file *filp, /* see include/linux/fs.h */ 
+			   char *buffer, /* buffer to fill with data */ 
+			   size_t length, /* length of the buffer */ 
+			   loff_t * offset) 
+
+{ 
+	int bytes_read = 0;
+
+	// wait_event_interruptible(queue, (curr != NULL));
+	
+	
+	while ((length != 0) & (curr != end)) 
+	{ //asks if user has more data to read 
+		put_user(*curr, buffer++); /* one char at a time... */ 
+		
+		curr++; //move to the next byte 
+		
+		if(curr == (start + 100)) //asks if end of data segment is at its end 
+			curr = (char*)start;//start at the beginning of allocated memory 
+
+		length--; //decrease length of remaining data 
+		bytes_read++; //increase number of bytes read by one byte 
+	}
+	return bytes_read; 
+}
+
+
+
+static ssize_t device_write(struct file *filp, 
+				const char *buff, 
+				size_t len, 
+				loff_t * off) 
+{
+	printk(KERN_ALERT "Sorry, this operation isn't supported.\n"); 
+	return -EINVAL; /* Fail */ 
+}
+
+
+irqreturn_t irq_handler(int irq, void *dev_id) 
+{ 
+	static int counter = 0; // 
+	static int counter2 = 0;
+	//printk(KERN_INFO, "IRQ Num %d for device, Interrupts processed %d times\n", irq, counter++);
+
+	counter2++;
+	message[counter2-1] = ioread32(virt_addr); //send data to virtual memory
+
+	if(counter2 == 100)//value corresponding to end of allocated memory 	
+	counter2 = 0; 
+	printk("VAL=%x \n",message[counter-1]); 
+	end++; //increment pointer 
+	if(end == (start + 100))//asks whether or not we need to shift to the beginning of the allocated memory 
+	end = start;
+ 
+	iowrite32(0xFFFFFFFF,virt_addr + 8); //clears interrupt register 
+	// wake_up_interruptible(&queue); /* Just wake up anything waiting for the device */
+	
+return IRQ_HANDLED;
+
+}
+
+
+/* These define info that can be displayed by modinfo */ 
+MODULE_LICENSE("GPL"); 
+MODULE_AUTHOR("Paul V. Gratz (and others)"); 
+MODULE_DESCRIPTION("Module which creates a character device and allows user interaction with it");
+/* Here we define which functions we want to use for initialization and cleanup */ 
+
+
+module_init(my_init); 
+module_exit(my_cleanup);
