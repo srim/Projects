@@ -1,0 +1,122 @@
+//generate normal traffic i.e size < 110
+//generate abnormal traffic
+//stop the traffic generator for 5 sec
+//restart the sending of data(normal read write)
+//send data in the read protected zone
+//send data in the write protected zone
+//if more than 5 read violations or 5 write violations, stop the traffic generator
+
+
+#include "AXIv2_Stub_Macros.h"
+
+
+#define MEMORY_UNIT_1 "mem[0]"
+#define MEMORY_UNIT_2 "mem[1]"
+#define MEMORY_UNIT_3 "mem[2]"
+#define MEMORY_UNIT_4 "mem[3]"
+#define MEMORY_UNIT_5 "mem[4]"
+#define MEMORY_UNIT_6 "mem[5]"
+#define MEMORY_UNIT_7 "mem[6]"
+#define MEMORY_UNIT_8 "mem[7]"
+#define MEMORY_UNIT_9 "mem[8]"
+#define MEMORY_UNIT_10 "mem[9]"
+#define MEMORY_UNIT_11 "mem[10]"
+#define MEMORY_UNIT_12 "mem[11]"
+#define MEMORY_UNIT_13 "mem[12]"
+#define MEMORY_UNIT_14 "mem[13]"
+#define MEMORY_UNIT_15 "mem[14]"
+#define MEMORY_UNIT_16 "mem[15]"
+
+int i;
+int p_in0;
+
+p_in0=getPortID("p_in0");
+if (p_in0 == 1)
+int write_addr_1 	= 0x00000000;
+int write_addr_2 	= 0x10000000;
+int write_addr_3 	= 0x20000000;
+int write_addr_4 	= 0x30000000;
+int write_addr_5 	= 0x40000000;
+int write_addr_6 	= 0x50000000;
+int write_addr_7 	= 0x60000000;
+int write_addr_8 	= 0x70000000;
+int write_addr_9  	= 0x80000000;
+int write_addr_10 	= 0x90000000;
+int write_addr_11 	= 0xa0000000;
+int write_addr_12 	= 0xb0000000;
+int write_addr_13 	= 0xc0000000;
+int write_addr_14 	= 0xd0000000;
+int write_addr_15 	= 0xe0000000;
+int write_addr_16 	= 0xf0000000;
+int mem_value = 1;
+
+int r_data_1=0x1234fff1;
+int r_data_2=0x1234fff2;
+int r_data_3=0x1234fff3;
+int r_data_4=0x1234fff4;
+int r_data_5=0x1234fff5;
+int r_data_6=0x1234fff6;
+int r_data_7=0x1234fff7;
+int r_data_8=0x1234fff8;
+int r_data_9=0xeeee1239;
+int r_data_10=0xeeee1210;
+int r_data_11=0xeeee1211;
+int r_data_12=0xeeee1212;
+int r_data_13=0xeeee1213;
+int r_data_14=0xeeee1214;
+int r_data_15=0xeeee1215;
+int r_data_16=0xeeee1216;
+
+
+//normal traffic
+BURST1_WRITE(write_addr_4+40,4,r_data_11);
+BURST2_WRITE(write_addr_4+44,4,r_data_12,r_data_12);
+BURST3_WRITE(write_addr_4+60,4,r_data_16,r_data_12,r_data_12);
+BURST4_WRITE(write_addr_15+40,4,r_data_11,r_data_12,r_data_12,r_data_12);
+BURST5_WRITE(write_addr_15+44,4,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12);
+BURST6_WRITE(write_addr_15+56,4,r_data_15,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12);
+BURST7_WRITE(write_addr_5+16,4,r_data_5,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12);
+BURST8_WRITE(write_addr_5+20,4,r_data_6,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12);
+BURST1_WRITE(write_addr_5+24,4,r_data_7,r_data_12);
+BURST2_WRITE(write_addr_5+28,4,r_data_8,r_data_12);
+BURST2_WRITE(write_addr_5+44,4,r_data_12,r_data_12);
+BURST3_WRITE(write_addr_5+48,4,r_data_13,r_data_12,r_data_12);
+BURST5_WRITE(write_addr_5+52,4,r_data_14,r_data_12,r_data_12,r_data_12,r_data_12);
+BURST1_WRITE(write_addr_5+56,4,r_data_15);
+BURST1_WRITE(write_addr_15+12,4,r_data_4);
+BURST8_WRITE(write_addr_1+52,4,r_data_14,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12);
+BURST3_WRITE(write_addr_12+16,4,r_data_5,r_data_12,r_data_12);
+BURST5_WRITE(write_addr_2+32,4,r_data_9,r_data_12,r_data_12,r_data_12,r_data_12);
+BURST7_WRITE(write_addr_2+36,4,r_data_10,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12);
+BURST1_WRITE(write_addr_2+40,4,r_data_11);
+BURST4_WRITE(write_addr_12+20,4,r_data_6,r_data_12,r_data_12,r_data_12);
+
+//abnormal traffic,but anomaly not genereated ,since its only for 3 bursts (<5)
+BURST9_WRITE(write_addr_9+28,4,r_data_8,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12);
+BURST12_WRITE(write_addr_1+32,4,r_data_9,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12);
+BURST10_WRITE(write_addr_2+36,4,r_data_10,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12);
+
+//resume normal traffic
+BURST1_WRITE(write_addr_13+8,4,r_data_3);
+BURST6_WRITE(write_addr_13+12,4,r_data_4,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12);
+BURST1_WRITE(write_addr_13+24,4,r_data_7);
+BURST4_WRITE(write_addr_12+24,4,r_data_7,r_data_12,r_data_12,r_data_12);
+BURST6_WRITE(write_addr_12+28,4,r_data_8,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12);
+BURST1_WRITE(write_addr_12+56,4,r_data_15);
+BURST8_WRITE(write_addr_4+12,4,r_data_4,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12);
+BURST7_WRITE(write_addr_4+28,4,r_data_8,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12);
+BURST3_WRITE(write_addr_4+32,4,r_data_9,r_data_12,r_data_12);
+BURST1_WRITE(write_addr_4+36,4,r_data_10);
+BURST1_WRITE(write_addr_12+60,4,r_data_16);
+
+//abnormal traffic,intrusion must be detected 
+BURST12_WRITE(write_addr_9+4,4,r_data_8,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12);
+BURST9_WRITE(write_addr_1+28,4,r_data_9,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12);
+BURST11_WRITE(write_addr_2+32,4,r_data_10,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12);
+BURST11_WRITE(write_addr_9+8,4,r_data_3,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12);
+BURST15_WRITE(write_addr_8+12,4,r_data_4,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12);
+
+//busy flag at slave port at this point must be high so as to not accept any traffic
+BURST9_WRITE(write_addr_9+16,4,r_data_5,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12,r_data_12);
+
+//p_in0 should become high ,script waits for 10 seconds

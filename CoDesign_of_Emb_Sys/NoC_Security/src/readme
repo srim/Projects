@@ -1,0 +1,10 @@
+-change the module name in CNI_router.v
+-change the address decoder of MCNIC.v for your need
+-change the configuration in constants.v
+-may need to change AXIv2_Master_FIFO.v and AXIv2_Slave_FIFO.v
+
+	-ver1.0
+		-Applied the NoC for 1M 1U
+	-ver1.1
+		-AXIv2_Master_FIFO.v is the latest version.
+		-SCNIC.v is the latest version.

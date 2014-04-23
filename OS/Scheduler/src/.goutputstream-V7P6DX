@@ -1,0 +1,125 @@
+/* 
+    Author: Joshua Capehart
+			Based on code by:
+			R. Bettati
+            Department of Computer Science
+            Texas A&M University
+			
+			A thread scheduler.
+
+*/
+#ifndef SCHEDULER_H
+#define SCHEDULER_H
+
+/*--------------------------------------------------------------------------*/
+/* DEFINES 
+/*--------------------------------------------------------------------------*/
+
+/*--------------------------------------------------------------------------*/
+/* INCLUDES 
+/*--------------------------------------------------------------------------*/
+#include "scheduler.H"
+#include "machine.H"
+#include "thread.H"
+//#include <cstddef>
+
+
+/*--------------------------------------------------------------------------*/
+/* SCHEDULER
+/*--------------------------------------------------------------------------*/
+
+//Scheduler::Scheduler()
+  // {
+		   
+   //}
+	 
+#if 0
+
+virtual void Scheduler:: yield()
+   {
+		   /* Called by the currently running thread in order to give up the CPU. 
+			  The scheduler selects the next thread from the ready queue to load onto 
+			  the CPU, and calls the dispatcher function defined in 'threads.h' to
+			  do the context switch. */
+			  //find 1st element in queue and call dipacth2(thread) and update pointers
+			  
+			  //void remove_from_queue()
+			  //{
+					Thread* thread;
+
+					if(first==NULL)
+					{
+						Console::Puts("\n\n...queue is empty...\n\n");
+						return 0;
+					}
+					
+					if(first==last)
+					{
+					thread=first->thread;
+					free(first);
+					first=NULL;
+					//return thread;
+					}
+
+					temp=first;
+					thread=temp->thread;
+					first=first->next;
+					free(temp);
+					//return thread;
+					Thread::dispatch_to(first->thread);
+				//}
+	  }
+	  
+	  
+	  
+
+   virtual void Scheduler:: resume(Thread * _thread)
+   {
+	   /* Add the given thread to the ready queue of the scheduler. This is called
+		  for threads that were waiting for an event to happen, or that have 
+		  to give up the CPU in response to a preemption. */
+		  add(_thread);
+	}
+
+   virtual void Scheduler:: add(Thread * _thread)
+   {
+	   /* Make the given thread runnable by the scheduler. This function is called
+		  typically after thread creation. Depending on the
+		  implementation, this may not entail more than simply adding the 
+		  thread to the ready queue (see scheduler_resume). */
+	  
+		 // void add_2_queue(Thread * _thread)
+		 //{
+			/* Allocate Ready_Queue struct size of memory*/
+			temp=(struct Ready_Queue*)malloc(sizeof(struct Ready_Queue));
+			/* Add the current thread to queue */
+			temp->thread=_thread;
+			temp->next=NULL;
+			if(first==NULL)
+			{
+				first=last=temp;
+				first->prev=NULL;
+
+				return;
+			}
+			else
+			{
+				last->next=temp;
+				temp->prev=last;
+				last=temp;
+			}
+		//}
+	
+}  
+	  
+	  
+
+   virtual void Scheduler::terminate(Thread * _thread)
+   {
+   /* Remove the given thread from the scheduler in preparation for destruction
+      of the thread. */
+	}
+
+	
+#endif
+#endif

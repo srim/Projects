@@ -1,0 +1,80 @@
+#include "AXIv2_Stub_Macros.h"
+#include "constants.h"
+
+int write_addr_1 	= 0x00000000;
+int write_addr_2 	= 0x10000000;
+int write_addr_3 	= 0x20000000;
+int write_addr_4 	= 0x30000000;
+int write_addr_5 	= 0x40000000;
+int write_addr_6 	= 0x50000000;
+int write_addr_7 	= 0x60000000;
+int write_addr_8 	= 0x70000000;
+int write_addr_9  	= 0x80000000;
+int write_addr_10 	= 0x90000000;
+int write_addr_11 	= 0xa0000000;
+int write_addr_12 	= 0xb0000000;
+int write_addr_13 	= 0xc0000000;
+int write_addr_14 	= 0xd0000000;
+int write_addr_15 	= 0xe0000000;
+int write_addr_16 	= 0xf0000000;
+int w_data=0x1234fff1;
+int i;
+int k=0;
+wait(200);
+for(i=0;i<NUM_PACKET;i=i+k)
+{	
+	if(TRAFFIC_PATTERN==0)	//uniform traffic
+	{
+		k=7;
+		BURST1_WRITE(write_addr_2,8,w_data);
+		wait(COMMAND_INTERVAL);
+		BURST1_WRITE(write_addr_1,8,w_data);
+		wait(COMMAND_INTERVAL);
+		BURST1_WRITE(write_addr_4,8,w_data);
+		wait(COMMAND_INTERVAL);	
+		BURST1_WRITE(write_addr_5,8,w_data);
+		wait(COMMAND_INTERVAL);
+		BURST1_WRITE(write_addr_6,8,w_data);
+		wait(COMMAND_INTERVAL);
+		BURST1_WRITE(write_addr_7,8,w_data);
+		wait(COMMAND_INTERVAL);
+		BURST1_WRITE(write_addr_8,8,w_data);
+		wait(COMMAND_INTERVAL);	
+		BURST1_WRITE(write_addr_9,8,w_data);
+		wait(COMMAND_INTERVAL);
+		BURST1_WRITE(write_addr_10,8,w_data);
+		wait(COMMAND_INTERVAL);
+		BURST1_WRITE(write_addr_11,8,w_data);
+		wait(COMMAND_INTERVAL);
+		BURST1_WRITE(write_addr_12,8,w_data);
+		wait(COMMAND_INTERVAL);	
+		BURST1_WRITE(write_addr_13,8,w_data);
+		wait(COMMAND_INTERVAL);
+		BURST1_WRITE(write_addr_14,8,w_data);
+		wait(COMMAND_INTERVAL);
+		BURST1_WRITE(write_addr_15,8,w_data);
+		wait(COMMAND_INTERVAL);
+		BURST1_WRITE(write_addr_16,8,w_data);
+		wait(COMMAND_INTERVAL);			
+	}
+	else if(TRAFFIC_PATTERN==1) //Bit reversal
+	{
+		k=1;
+		BURST1_WRITE(write_addr_5,8,w_data);
+		wait(COMMAND_INTERVAL);			
+	}
+	else if(TRAFFIC_PATTERN==2)	//matrix transpose
+	{
+		k=1;
+		BURST1_WRITE(write_addr_9,8,w_data);
+		wait(COMMAND_INTERVAL);
+		
+	}
+	else if(TRAFFIC_PATTERN==3)	//hotpot
+	{
+		k=1;
+		BURST1_WRITE(write_addr_5,8,w_data);
+		wait(COMMAND_INTERVAL);
+	}
+	
+}
